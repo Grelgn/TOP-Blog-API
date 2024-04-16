@@ -2,15 +2,15 @@ const Post = require("../models/post");
 const jwt = require("jsonwebtoken");
 
 exports.getAllPosts = async (req, res) => {
-	const posts = await Post.find();
-	return res.send(posts);
+	const posts = await Post.find().sort({ timestamp: -1 });
+	res.json(posts);
 };
 
 exports.publishPost = (req, res) => {
 	jwt.verify(req.token, process.env.JWT_KEY, async (err, authData) => {
 		if (err) {
 			res.sendStatus(403);
-		} else {
+		} else if (req.body.title && req.body.text) {
 			const post = new Post({
 				title: req.body.title,
 				text: req.body.text,
@@ -22,13 +22,15 @@ exports.publishPost = (req, res) => {
 			res.json({
 				message: `The post has been saved with the ID of ${post._id}`,
 			});
-		}
+		} else {
+            res.sendStatus(406)
+        }
 	});
 };
 
 exports.getPost = async (req, res) => {
 	const post = await Post.findById(req.params.postId);
-	return res.send(post);
+	res.json(post);
 };
 
 exports.updatePost = async (req, res) => {

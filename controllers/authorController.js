@@ -11,7 +11,7 @@ exports.new = async (req, res) => {
 	});
 	await author.save();
 
-	return res.send(`The author named ${req.body.username} has been saved`);
+	res.json({ message: `The author named ${req.body.username} has been saved` });
 };
 
 exports.logIn = async (req, res) => {
@@ -19,7 +19,7 @@ exports.logIn = async (req, res) => {
 	const match = await bcrypt.compare(req.body.password, author.password);
 
 	if (!match) {
-		return res.send("Login unsuccessful");
+		res.sendStatus(401);
 	} else {
 		jwt.sign(
 			{ user: author },
