@@ -1,15 +1,25 @@
-exports.getComments = (req, res) => {
-    return res.send(`GET - View comments on post: ${req.params.postId}`)
-}
+const Comment = require("../models/comment");
 
-exports.postComment = (req, res) => {
-    return res.send(`GET - Post a comment on post: ${req.params.postId}`)
-}
+exports.getComments = async (req, res) => {
+	const comments = await Comment.find({ post: req.params.postId });
+	return res.send(comments);
+};
 
-exports.getComment = (req, res) => {
-    return res.send(`GET - View comment: ${req.params.commentId} on post: ${req.params.postId}`)
-}
+exports.postComment = async (req, res) => {
+	const comment = new Comment({
+		username: req.body.username,
+		text: req.body.text,
+		timestamp: new Date(),
+		post: req.params.postId,
+	});
+	await comment.save();
 
-exports.deleteComment = (req, res) => {
-    return res.send(`GET - Delete comment: ${req.params.commentId} on post: ${req.params.postId}`)
-}
+	return res.send(`The comment has been saved with the ID of ${comment._id}`);
+};
+
+exports.deleteComment = async (req, res) => {
+	await Comment.findByIdAndDelete(req.params.commentId);
+	return res.send(
+		`The comment with the ID of ${req.params.commentId} has been deleted`
+	);
+};

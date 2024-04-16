@@ -9,7 +9,7 @@ exports.publishPost = async (req, res) => {
 	const post = new Post({
 		title: req.body.title,
 		text: req.body.text,
-		timestamp: req.body.timestamp,
+		timestamp: new Date(),
 		isPublished: req.body.isPublished,
 	});
 	await post.save();
