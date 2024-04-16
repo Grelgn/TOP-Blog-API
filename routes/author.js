@@ -5,8 +5,8 @@ const router = express.Router();
 const authorController = require("../controllers/authorController");
 
 // Author
-router.get("/", authorController.loginForm);
-router.post("/", authorController.logIn);
+router.post("/new", authorController.new);
+router.post("/login", authorController.logIn);
 
 module.exports = router;
 
