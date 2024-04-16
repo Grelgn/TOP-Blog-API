@@ -21,10 +21,15 @@ exports.logIn = async (req, res) => {
 	if (!match) {
 		return res.send("Login unsuccessful");
 	} else {
-		jwt.sign({ user: author }, process.env.JWT_KEY, (err, token) => {
-			res.json({
-				token,
-			});
-		});
+		jwt.sign(
+			{ user: author },
+			process.env.JWT_KEY,
+			{ expiresIn: "8h" },
+			(err, token) => {
+				res.json({
+					token,
+				});
+			}
+		);
 	}
 };

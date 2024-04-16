@@ -1,20 +1,29 @@
 const Post = require("../models/post");
+const jwt = require("jsonwebtoken");
 
 exports.getAllPosts = async (req, res) => {
 	const posts = await Post.find();
 	return res.send(posts);
 };
 
-exports.publishPost = async (req, res) => {
-	const post = new Post({
-		title: req.body.title,
-		text: req.body.text,
-		timestamp: new Date(),
-		isPublished: req.body.isPublished,
-	});
-	await post.save();
+exports.publishPost = (req, res) => {
+	jwt.verify(req.token, process.env.JWT_KEY, async (err, authData) => {
+		if (err) {
+			res.sendStatus(403);
+		} else {
+			const post = new Post({
+				title: req.body.title,
+				text: req.body.text,
+				timestamp: new Date(),
+				isPublished: req.body.isPublished,
+			});
+			await post.save();
 
-	return res.send(`The post has been saved with the ID of ${post._id}`);
+			res.json({
+				message: `The post has been saved with the ID of ${post._id}`,
+			});
+		}
+	});
 };
 
 exports.getPost = async (req, res) => {
@@ -23,30 +32,48 @@ exports.getPost = async (req, res) => {
 };
 
 exports.updatePost = async (req, res) => {
-	if (req.body.title) {
-		await Post.findByIdAndUpdate(req.params.postId, { title: req.body.title });
-	}
+	jwt.verify(req.token, process.env.JWT_KEY, async (err, authData) => {
+		if (err) {
+			res.sendStatus(403);
+		} else {
+			if (req.body.title) {
+				await Post.findByIdAndUpdate(req.params.postId, {
+					title: req.body.title,
+				});
+			}
 
-	if (req.body.text) {
-		await Post.findByIdAndUpdate(req.params.postId, { text: req.body.text });
-	}
+			if (req.body.text) {
+				await Post.findByIdAndUpdate(req.params.postId, { text: req.body.text });
+			}
 
-	if (req.body.timestamp) {
-		await Post.findByIdAndUpdate(req.params.postId, {
-			timestamp: req.body.timestamp,
-		});
-	}
+			if (req.body.timestamp) {
+				await Post.findByIdAndUpdate(req.params.postId, {
+					timestamp: req.body.timestamp,
+				});
+			}
 
-	if (req.body.isPublished) {
-		await Post.findByIdAndUpdate(req.params.postId, {
-			isPublished: req.body.isPublished,
-		});
-	}
+			if (req.body.isPublished) {
+				await Post.findByIdAndUpdate(req.params.postId, {
+					isPublished: req.body.isPublished,
+				});
+			}
 
-	return res.send(`The post with the ID of ${req.params.postId} has been updated`);
+			res.json({
+				message: `The post with the ID of ${req.params.postId} has been updated`,
+			});
+		}
+	});
 };
 
 exports.deletePost = async (req, res) => {
-	await Post.findByIdAndDelete(req.params.postId);
-	return res.send(`The post with the ID of ${req.params.postId} has been deleted`);
+	jwt.verify(req.token, process.env.JWT_KEY, async (err, authData) => {
+		if (err) {
+			res.sendStatus(403);
+		} else {
+			await Post.findByIdAndDelete(req.params.postId);
+			res.json({
+				message: `The post with the ID of ${req.params.postId} has been deleted`,
+			});
+		}
+	});
 };

@@ -1,4 +1,5 @@
 const Comment = require("../models/comment");
+const jwt = require("jsonwebtoken");
 
 exports.getComments = async (req, res) => {
 	const comments = await Comment.find({ post: req.params.postId });
@@ -18,8 +19,15 @@ exports.postComment = async (req, res) => {
 };
 
 exports.deleteComment = async (req, res) => {
-	await Comment.findByIdAndDelete(req.params.commentId);
-	return res.send(
-		`The comment with the ID of ${req.params.commentId} has been deleted`
-	);
+	jwt.verify(req.token, process.env.JWT_KEY, async (err, authData) => {
+		if (err) {
+			res.sendStatus(403);
+		} else {
+			await Comment.findByIdAndDelete(req.params.commentId);
+			res.json({
+				message: `The comment with the ID of ${req.params.commentId} has been deleted`,
+				authData,
+			});
+		}
+	});
 };
