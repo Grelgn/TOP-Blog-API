@@ -9,4 +9,3 @@ router.post("/new", authorController.new);
 router.post("/login", authorController.logIn);
 
 module.exports = router;
-

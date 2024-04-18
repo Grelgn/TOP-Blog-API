@@ -6,15 +6,15 @@ const postController = require("../controllers/postController");
 const commentController = require("../controllers/commentController");
 
 function verifyToken(req, res, next) {
-	const bearerHeader = req.headers["authorization"];
-	if (typeof bearerHeader !== "undefined") {
-		const bearer = bearerHeader.split(" ");
-		const bearerToken = bearer[1];
-		req.token = bearerToken;
-		next();
-	} else {
-		res.sendStatus(403);
-	}
+  const bearerHeader = req.headers["authorization"];
+  if (typeof bearerHeader !== "undefined") {
+    const bearer = bearerHeader.split(" ");
+    const bearerToken = bearer[1];
+    req.token = bearerToken;
+    next();
+  } else {
+    res.sendStatus(403);
+  }
 }
 
 // Post
@@ -28,9 +28,9 @@ router.delete("/:postId", verifyToken, postController.deletePost);
 router.get("/:postId/comments", commentController.getComments);
 router.post("/:postId/comments", commentController.postComment);
 router.delete(
-	"/:postId/comments/:commentId",
-	verifyToken,
-	commentController.deleteComment
+  "/:postId/comments/:commentId",
+  verifyToken,
+  commentController.deleteComment,
 );
 
 module.exports = router;
